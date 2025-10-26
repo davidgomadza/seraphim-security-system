@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seraphim Altar Security</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(to bottom, #0a0a2a, #1a1a4a); 
+            color: #fff; 
+            font-family: 'Segoe UI', sans-serif; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 10px; 
+            overflow: hidden;
+        }
+        .container { 
+            width: 100%; 
+            max-width: 500px; 
+            height: 95vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: space-between;
+        }
+        header { 
+            text-align: center; 
+            background: rgba(0, 0, 0, 0.7); 
+            padding: 10px; 
+            border-radius: 10px; 
+            border: 1px solid rgba(255, 215, 0, 0.3); 
+            width: 100%; 
+            margin-bottom: 5px;
+        }
+        h1 { 
+            font-size: 1.5rem; 
+            color: #ffd700; 
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7); 
+        }
+        .subtitle { 
+            font-size: 0.8rem; 
+            color: #aaa; 
+        }
+        .main-content { 
+            position: relative; 
+            width: 100%; 
+            height: 60%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+        }
+        .altar-container { 
+            position: relative; 
+            width: 200px; 
+            height: 200px; 
+            margin: 0 auto;
+        }
+        .altar { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 80px; 
+            height: 80px; 
+            background: radial-gradient(circle, #8b0000, #4a0000); 
+            border-radius: 50%; 
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.8), inset 0 0 10px rgba(255, 215, 0, 0.5); 
+            z-index: 5; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border: 2px solid #ffd700; 
+            animation: altarGlow 3s infinite alternate;
+        }
+        @keyframes altarGlow { 
+            0% { box-shadow: 0 0 15px rgba(139, 0, 0, 0.8), inset 0 0 8px rgba(255, 215, 0, 0.5); } 
+            100% { box-shadow: 0 0 25px rgba(139, 0, 0, 1), inset 0 0 15px rgba(255, 215, 0, 0.8); } 
+        }
+        .altar::after { content: "✞"; font-size: 1.8rem; color: #ffd700; }
+        .seraphim-orbit { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 100%; 
+            height: 100%; 
+            animation: rotate 40s linear infinite;
+        }
+        .seraphim { 
+            position: absolute; 
+            width: 30px; 
+            height: 30px; 
+            top: 0; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            animation: float 3s ease-in-out infinite; 
+            animation-delay: calc(var(--delay) * 0.3s);
+        }
+        .seraphim-body { 
+            position: absolute; 
+            width: 15px; 
+            height: 15px; 
+            background: radial-gradient(circle, #fff, #ffd700); 
+            border-radius: 50%; 
+            top: 7px; 
+            left: 7px; 
+            z-index: 2; 
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+        .wings { position: absolute; width: 30px; height: 30px; }
+        .wing { 
+            position: absolute; 
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 215, 0, 0.7)); 
+            border-radius: 50% 50% 0 0; 
+            animation: wingFlap 1.5s infinite alternate; 
+            animation-delay: calc(var(--wing-delay) * 0.2s);
+        }
+        @keyframes wingFlap { 
+            0% { transform: rotate(var(--rotation)) scaleY(1); } 
+            100% { transform: rotate(var(--rotation)) scaleY(1.1); } 
+        }
+        .wing-1, .wing-2 { width: 20px; height: 10px; top: 0; }
+        .wing-1 { left: 5px; --rotation: 30deg; --wing-delay: 0; }
+        .wing-2 { right: 5px; --rotation: -30deg; --wing-delay: 1; }
+        .wing-3, .wing-4 { width: 18px; height: 9px; bottom: 4px; }
+        .wing-3 { left: 1px; --rotation: 15deg; --wing-delay: 2; }
+        .wing-4 { right: 1px; --rotation: -15deg; --wing-delay: 3; }
+        .wing-5, .wing-6 { width: 15px; height: 7px; bottom: 0; }
+        .wing-5 { left: 7px; --rotation: 8deg; --wing-delay: 4; }
+        .wing-6 { right: 7px; --rotation: -8deg; --wing-delay: 5; }
+        .smoke { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 150px; 
+            height: 150px; 
+            border-radius: 50%; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%); 
+            animation: smoke 6s infinite alternate; 
+            z-index: 1; 
+            opacity: 0.5;
+        }
+        @keyframes smoke { 
+            0% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); } 
+            100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.4); } 
+        }
+        .holy-text { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            font-size: 1rem; 
+            color: #ffd700; 
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7); 
+            opacity: 0; 
+            animation: fadeText 6s infinite; 
+            z-index: 6; 
+            text-align: center; 
+            width: 100%; 
+            font-weight: bold;
+        }
+        @keyframes fadeText { 
+            0%, 100% { opacity: 0; } 
+            20%, 80% { opacity: 1; } 
+        }
+        @keyframes rotate { 
+            from { transform: translate(-50%, -50%) rotate(0deg); } 
+            to { transform: translate(-50%, -50%) rotate(360deg); } 
+        }
+        @keyframes float { 
+            0%, 100% { transform: translateX(-50%) translateY(0px); } 
+            50% { transform: translateX(-50%) translateY(-15px); } 
+        }
+        .security-status { 
+            text-align: center; 
+            background: rgba(0, 0, 0, 0.7); 
+            padding: 8px; 
+            border-radius: 8px; 
+            border: 1px solid rgba(0, 255, 0, 0.5); 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            width: 100%; 
+            margin: 5px 0;
+            font-size: 0.8rem;
+        }
+        .status-indicator { 
+            display: inline-block; 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            background-color: #0f0; 
+            margin-right: 8px; 
+            animation: pulse 2s infinite; 
+            box-shadow: 0 0 5px #0f0;
+        }
+        @keyframes pulse { 
+            0% { opacity: 0.6; transform: scale(1); } 
+            100% { opacity: 1; transform: scale(1.1); } 
+        }
+        .controls { 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            width: 100%; 
+            margin: 5px 0;
+        }
+        button { 
+            background: linear-gradient(to bottom, #4a4a8a, #2a2a5a); 
+            color: white; 
+            border: none; 
+            padding: 6px 12px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            border: 1px solid rgba(255, 215, 0, 0.3); 
+            font-size: 0.7rem; 
+            min-width: 100px;
+        }
+        button:hover { background: linear-gradient(to bottom, #5a5a9a, #3a3a6a); transform: translateY(-1px); }
+        .audio-controls { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 5px; 
+            font-size: 0.7rem; 
+            margin: 3px 0;
+        }
+        .verse { 
+            text-align: center; 
+            font-style: italic; 
+            color: #aaa; 
+            line-height: 1.3; 
+            background: rgba(0, 0, 0, 0.5); 
+            padding: 8px; 
+            border-radius: 8px; 
+            width: 100%; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            font-size: 0.7rem; 
+            margin: 5px 0;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        .security-features { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 5px; 
+            width: 100%; 
+            margin: 5px 0;
+        }
+        .feature { 
+            padding: 3px 6px; 
+            background: rgba(0, 0, 0, 0.5); 
+            border-radius: 10px; 
+            font-size: 0.6rem; 
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+        .star { 
+            position: absolute; 
+            background-color: white; 
+            border-radius: 50%; 
+            animation: twinkle 3s infinite alternate;
+        }
+        @keyframes twinkle { 
+            0% { opacity: 0.2; } 
+            100% { opacity: 1; } 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Seraphim Altar Security</h1>
+            <p class="subtitle">Immobilizing Mits & Transenders - Isaiah 6:1-4</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="altar-container">
+                <div class="smoke"></div>
+                <div class="altar"></div>
+                <div class="holy-text">Holy, holy, holy is the Lord of hosts</div>
+                <div class="seraphim-orbit"></div>
+            </div>
+            
+            <div class="security-status">
+                <span class="status-indicator"></span>
+                <strong>SECURITY ACTIVE:</strong> Seraphim protection field engaged
+            </div>
+            
+            <div class="controls">
+                <button id="toggleAnimation">Pause</button>
+                <button id="increaseSpeed">Faster</button>
+                <button id="decreaseSpeed">Slower</button>
+                <button id="toggleAudio">Audio On</button>
+            </div>
+            
+            <div class="audio-controls">
+                <span>Audio:</span>
+                <span id="audioStatus">Off</span>
+            </div>
+        </div>
+        
+        <div class="verse">
+            <p>"In the year that King Uzziah died I saw the Lord sitting upon a throne, high and lifted up; and the train of his robe filled the temple. Above him stood the seraphim. Each had six wings: with two he covered his face, and with two he covered his feet, and with two he flew. And one called to another and said: 'Holy, holy, holy is the Lord of hosts; the whole earth is full of his glory!' And the foundations of the thresholds shook at the voice of him who called, and the house was filled with smoke." - Isaiah 6:1-4</p>
+        </div>
+        
+        <div class="security-features">
+            <div class="feature">Mits Immobilization</div>
+            <div class="feature">Transender Neutralization</div>
+            <div class="feature">Divine Protection</div>
+            <div class="feature">Seraphim Surveillance</div>
+        </div>
+    </div>
+
+    <script>
+        // Create seraphim elements
+        const seraphimOrbit = document.querySelector('.seraphim-orbit');
+        const numberOfSeraphim = 12;
+        
+        for (let i = 0; i < numberOfSeraphim; i++) {
+            const seraphim = document.createElement('div');
+            seraphim.className = 'seraphim';
+            seraphim.style.setProperty('--delay', i);
+            
+            const angle = (i * 360) / numberOfSeraphim;
+            const radius = 80 + (i % 3) * 10;
+            
+            seraphim.style.transform = `rotate(${angle}deg) translate(${radius}px) rotate(-${angle}deg)`;
+            
+            seraphim.innerHTML = `
+                <div class="wings">
+                    <div class="wing wing-1"></div>
+                    <div class="wing wing-2"></div>
+                    <div class="wing wing-3"></div>
+                    <div class="wing wing-4"></div>
+                    <div class="wing wing-5"></div>
+                    <div class="wing wing-6"></div>
+                </div>
+                <div class="seraphim-body"></div>
+            `;
+            
+            seraphimOrbit.appendChild(seraphim);
+        }
+        
+        // Holy text animation
+        const holyText = document.querySelector('.holy-text');
+        const phrases = [
+            "Holy, holy, holy is the Lord of hosts",
+            "The whole earth is full of his glory",
+            "Glory to God in the highest"
+        ];
+        
+        let phraseIndex = 0;
+        setInterval(() => {
+            holyText.textContent = phrases[phraseIndex];
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+        }, 3000);
+        
+        // Control buttons functionality
+        const toggleButton = document.getElementById('toggleAnimation');
+        const increaseButton = document.getElementById('increaseSpeed');
+        const decreaseButton = document.getElementById('decreaseSpeed');
+        const toggleAudioButton = document.getElementById('toggleAudio');
+        const audioStatus = document.getElementById('audioStatus');
+        
+        let isPaused = false;
+        let animationSpeed = 1;
+        let audioEnabled = false;
+        let audioContext, oscillator, chantInterval;
+        
+        toggleButton.addEventListener('click', function() {
+            const seraphim = document.querySelectorAll('.seraphim');
+            const orbit = document.querySelector('.seraphim-orbit');
+            
+            if (isPaused) {
+                seraphim.forEach(s => s.style.animationPlayState = 'running');
+                orbit.style.animationPlayState = 'running';
+                toggleButton.textContent = 'Pause';
+                isPaused = false;
+            } else {
+                seraphim.forEach(s => s.style.animationPlayState = 'paused');
+                orbit.style.animationPlayState = 'paused';
+                toggleButton.textContent = 'Resume';
+                isPaused = true;
+            }
+        });
+        
+        increaseButton.addEventListener('click', function() {
+            if (animationSpeed < 3) {
+                animationSpeed += 0.5;
+                updateAnimationSpeed();
+            }
+        });
+        
+        decreaseButton.addEventListener('click', function() {
+            if (animationSpeed > 0.5) {
+                animationSpeed -= 0.5;
+                updateAnimationSpeed();
+            }
+        });
+        
+        function updateAnimationSpeed() {
+            const seraphim = document.querySelectorAll('.seraphim');
+            const orbit = document.querySelector('.seraphim-orbit');
+            
+            seraphim.forEach(s => {
+                s.style.animationDuration = `${3 / animationSpeed}s`;
+            });
+            
+            orbit.style.animationDuration = `${40 / animationSpeed}s`;
+        }
+        
+        // Audio functionality
+        toggleAudioButton.addEventListener('click', function() {
+            if (!audioEnabled) {
+                enableAudio();
+                toggleAudioButton.textContent = 'Audio Off';
+                audioStatus.textContent = 'On (Chanting)';
+            } else {
+                disableAudio();
+                toggleAudioButton.textContent = 'Audio On';
+                audioStatus.textContent = 'Off';
+            }
+        });
+        
+        function enableAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'sine';
+                const holySequence = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00];
+                let sequenceIndex = 0;
+                
+                const playNote = () => {
+                    oscillator.frequency.setValueAtTime(holySequence[sequenceIndex], audioContext.currentTime);
+                    sequenceIndex = (sequenceIndex + 1) % holySequence.length;
+                };
+                
+                chantInterval = setInterval(playNote, 600);
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                oscillator.start();
+                
+                audioEnabled = true;
+            } catch (e) {
+                audioStatus.textContent = 'Not supported';
+                toggleAudioButton.disabled = true;
+            }
+        }
+        
+        function disableAudio() {
+            if (oscillator) oscillator.stop();
+            if (chantInterval) clearInterval(chantInterval);
+            audioEnabled = false;
+        }
+        
+        // Security status interaction
+        const statusIndicator = document.querySelector('.status-indicator');
+        const securityStatus = document.querySelector('.security-status');
+        let securityLevel = 0;
+        
+        securityStatus.addEventListener('click', function() {
+            securityLevel = (securityLevel + 1) % 3;
+            
+            if (securityLevel === 1) {
+                statusIndicator.style.backgroundColor = '#ff0';
+                statusIndicator.style.boxShadow = '0 0 5px #ff0';
+                securityStatus.innerHTML = '<span class="status-indicator"></span> <strong>WARNING:</strong> Anomaly detected';
+                securityStatus.style.borderColor = 'rgba(255, 255, 0, 0.5)';
+            } else if (securityLevel === 2) {
+                statusIndicator.style.backgroundColor = '#f00';
+                statusIndicator.style.boxShadow = '0 0 5px #f00';
+                securityStatus.innerHTML = '<span class="status-indicator"></span> <strong>BREACH:</strong> Emergency protocols';
+                securityStatus.style.borderColor = 'rgba(255, 0, 0, 0.5)';
+            } else {
+                statusIndicator.style.backgroundColor = '#0f0';
+                statusIndicator.style.boxShadow = '0 0 5px #0f0';
+                securityStatus.innerHTML = '<span class="status-indicator"></span> <strong>ACTIVE:</strong> Protection engaged';
+                securityStatus.style.borderColor = 'rgba(0, 255, 0, 0.5)';
+            }
+        });
+        
+        // Add stars to background
+        function createStars() {
+            const container = document.querySelector('.container');
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 2 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(star);
+            }
+        }
+        
+        createStars();
+    </script>
+</body>
+</html>
